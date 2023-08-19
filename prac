@@ -1,0 +1,117 @@
+hive> create table sales_data_static_part
+    > (
+    > ORDERNUMBER int,
+    > QUANTITYORDERED int,
+    > SALES float,
+    > YEAR_ID int
+    > )
+    > partitioned by (COUNTRY string);
+OK
+Time taken: 0.187 seconds
+hive> insert overwrite table sales_data_static_part partition(country = 'USA') select ordernumber,quantityordered,sales,year_id from sales_ord er_data_orc where country = 'USA';
+FAILED: SemanticException [Error 10001]: Line 1:127 Table not found 'sales_ord'
+hive> insert overwrite table sales_data_static_part partition(country = 'USA') select ordernumber,quantityordered,sales,year_id from sales_order_data_orc where country = 'USA';
+Query ID = abc_20230819210012_88f5a4c1-fec6-4885-892d-199f50993c94
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1692458405641_0003, Tracking URL = http://bc9c04f9483c:8088/proxy/application_1692458405641_0003/
+Kill Command = /usr/local/hadoop/bin/mapred job  -kill job_1692458405641_0003
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2023-08-19 21:00:38,854 Stage-1 map = 0%,  reduce = 0%
+2023-08-19 21:01:00,611 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 20.6 sec
+2023-08-19 21:01:14,418 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 23.87 sec
+MapReduce Total cumulative CPU time: 23 seconds 870 msec
+Ended Job = job_1692458405641_0003
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to directory hdfs://localhost/user/hive/warehouse/sales_data_static_part/country=USA/.hive-staging_hive_2023-08-19_21-00-12_142_1868057689723103308-1/-ext-10000
+Loading data to table default.sales_data_static_part partition (country=USA)
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 23.87 sec   HDFS Read: 52455 HDFS Write: 24511 SUCCESS
+Total MapReduce CPU Time Spent: 23 seconds 870 msec
+OK
+Time taken: 67.438 seconds
+hive> set hive.exec.dynamic.partition.mode=nonstrict;
+hive> 
+    > hive> create table sales_data_dynamic_part
+    > ( ORDERNUMBER int,
+    > QUANTITYORDERED int,
+    > SALES float,
+    > YEAR_ID int
+    > ) partitioned by (COUNTRY string);
+
+hive> create table sales_data_dynamic_part
+    > ( ORDERNUMBER int,
+    > QUANTITYORDERED int,
+    > SALES float,
+    > YEAR_ID int
+    > ) partitioned by (COUNTRY string);
+OK
+Time taken: 0.276 seconds
+hive> insert overwrite table sales_data_dynamic_part partition(country) select ordernumber,quantityordered,sales,year_id,country from sales_order_data_orc;
+Query ID = abc_20230819210249_641ecf62-a8e9-4ffd-b88a-ed5b4aa4f41a
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1692458405641_0004, Tracking URL = http://bc9c04f9483c:8088/proxy/application_1692458405641_0004/
+Kill Command = /usr/local/hadoop/bin/mapred job  -kill job_1692458405641_0004
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2023-08-19 21:03:13,505 Stage-1 map = 0%,  reduce = 0%
+2023-08-19 21:03:39,507 Stage-1 map = 67%,  reduce = 0%, Cumulative CPU 23.99 sec
+2023-08-19 21:03:40,572 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 24.28 sec
+2023-08-19 21:03:53,380 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 27.65 sec
+MapReduce Total cumulative CPU time: 27 seconds 650 msec
+Ended Job = job_1692458405641_0004
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to directory hdfs://localhost/user/hive/warehouse/sales_data_dynamic_part/.hive-staging_hive_2023-08-19_21-02-49_632_3024294119569244864-1/-ext-10000
+Loading data to table default.sales_data_dynamic_part partition (country=null)
+
+
+         Time taken to load dynamic partitions: 6.058 seconds
+         Time taken for adding to write entity : 0.001 seconds
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 27.65 sec   HDFS Read: 52264 HDFS Write: 82636 SUCCESS
+Total MapReduce CPU Time Spent: 27 seconds 650 msec
+OK
+Time taken: 76.84 seconds
+hive> create table sales_data_dynamic_multilevel_part_v1
+    > ( ORDERNUMBER int,
+    > QUANTITYORDERED int,
+    > SALES float
+    > ) partitioned by (COUNTRY string, YEAR_ID int);
+OK
+Time taken: 0.187 seconds
+hive> insert overwrite table sales_data_dynamic_multilevel_part_v1 partition(country,year_id) select ordernumber,quantityordered,sales,country ,year_id from sales_order_data_orc;
+Query ID = abc_20230819210521_7c198360-216e-4713-a845-984c048ca8d1
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1692458405641_0005, Tracking URL = http://bc9c04f9483c:8088/proxy/application_1692458405641_0005/
+Kill Command = /usr/local/hadoop/bin/mapred job  -kill job_1692458405641_0005
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2023-08-19 21:05:44,497 Stage-1 map = 0%,  reduce = 0%
+2023-08-19 21:06:38,770 Stage-1 map = 100%,  reduce = 100%
+java.io.IOException: java.net.ConnectException: Your endpoint configuration is wrong; For more details see:  http://wiki.apache.org/hadoop/UnsetHostnameOrPort
+    
